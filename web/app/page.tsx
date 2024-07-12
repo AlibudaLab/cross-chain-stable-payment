@@ -1,5 +1,5 @@
+import { redirect } from 'next/navigation';
 import { generateMetadata } from '@/utils/generateMetadata';
-import HomePage from './home/HomePage';
 
 export const metadata = generateMetadata({
   title: 'Build Onchain Apps Template',
@@ -16,5 +16,5 @@ export const metadata = generateMetadata({
  * https://nextjs.org/docs/app/building-your-application/rendering/client-components
  */
 export default function Page() {
-  return <HomePage />;
+  redirect('/payment/send');
 }
