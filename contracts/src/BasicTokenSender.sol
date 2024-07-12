@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.25;
 
 import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import {IERC20} from "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.3/contracts/token/ERC20/IERC20.sol";
@@ -7,7 +7,7 @@ import {SafeERC20} from "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {Withdraw} from "./utils/Withdraw.sol";
-
+import {IERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
@@ -78,6 +78,67 @@ contract BasicTokenSender is Withdraw {
 
         bytes32 messageId;
 
+        if (payFeesIn == PayFeesIn.LINK) {
+            LinkTokenInterface(i_link).approve(i_router, fee);
+            messageId = IRouterClient(i_router).ccipSend(
+                destinationChainSelector,
+                message
+            );
+        } else {
+            messageId = IRouterClient(i_router).ccipSend{value: fee}(
+                destinationChainSelector,
+                message
+            );
+        }
+
+        emit MessageSent(messageId);
+    }
+
+    function sendWithPermit(
+        uint64 destinationChainSelector,
+        address receiver,
+        address token,
+        uint256 amount,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s,
+        PayFeesIn payFeesIn
+    ) external {
+        // Execute the permit
+        IERC20Permit(token).permit(msg.sender, address(this), amount, deadline, v, r, s);
+
+        // Create the token amount array
+        Client.EVMTokenAmount[] memory tokensToSendDetails = new Client.EVMTokenAmount[](1);
+        tokensToSendDetails[0] = Client.EVMTokenAmount({
+            token: token,
+            amount: amount
+        });
+
+        // Transfer the tokens to this contract
+        IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
+
+        // Approve the router to spend tokens
+        IERC20(token).approve(i_router, amount);
+
+        // Create the message
+        Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
+            receiver: abi.encode(receiver),
+            data: "",
+            tokenAmounts: tokensToSendDetails,
+            extraArgs: "",
+            feeToken: payFeesIn == PayFeesIn.LINK ? i_link : address(0)
+        });
+
+        // Get the fee
+        uint256 fee = IRouterClient(i_router).getFee(
+            destinationChainSelector,
+            message
+        );
+
+        bytes32 messageId;
+
+        // Send the message
         if (payFeesIn == PayFeesIn.LINK) {
             LinkTokenInterface(i_link).approve(i_router, fee);
             messageId = IRouterClient(i_router).ccipSend(
