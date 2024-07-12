@@ -16,3 +16,9 @@ docs/
 # Code Coverage
 lcov.info
 report/
+
+# Node modules
+node_modules/
+
+# Foundry
+lib/
