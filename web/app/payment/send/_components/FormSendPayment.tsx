@@ -4,7 +4,6 @@ import { parseEther } from 'viem';
 import Button from '@/components/Button/Button';
 import { useBuyMeACoffeeContract } from '../_contracts/useBuyMeACoffeeContract';
 import useFields from '../_hooks/useFields';
-import useOnchainCoffeeMemos from '../_hooks/useOnchainCoffeeMemos';
 import ContractAlert from './ContractAlert';
 import InputText from './InputText';
 import Label from './Label';
@@ -29,19 +28,14 @@ type Fields = {
   message: string;
 };
 
-type FormBuyCoffeeProps = {
-  refetchMemos: ReturnType<typeof useOnchainCoffeeMemos>['refetchMemos'];
-};
-
-function FormBuyCoffee({ refetchMemos }: FormBuyCoffeeProps) {
+function FormSendPayment() {
   const contract = useBuyMeACoffeeContract();
 
   const { fields, setField, resetFields } = useFields<Fields>(initFields);
 
   const reset = useCallback(async () => {
     resetFields();
-    await refetchMemos();
-  }, [refetchMemos, resetFields]);
+  }, [resetFields]);
 
   const { disabled, transactionState, resetContractForms, onSubmitTransaction } =
     useSmartContractForms({
@@ -150,4 +144,4 @@ function FormBuyCoffee({ refetchMemos }: FormBuyCoffeeProps) {
   );
 }
 
-export default FormBuyCoffee;
+export default FormSendPayment;
