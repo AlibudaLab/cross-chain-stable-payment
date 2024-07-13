@@ -11,7 +11,7 @@ import TextArea from './TextArea';
 import TransactionSteps from './TransactionSteps';
 import useSmartContractForms from './useSmartContractForms';
 
-const GAS_COST = 0.0001;
+const GAS_COST = 0;
 const COFFEE_COUNT = [1, 2, 3, 4];
 
 const initFields = {
