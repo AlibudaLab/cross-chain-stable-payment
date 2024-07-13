@@ -6,9 +6,11 @@ import { initAnalytics } from '@/utils/analytics';
 import { inter } from './fonts';
 import { Providers } from './providers';
 import type { Metadata } from 'next';
-import { DynamicWagmiConnector, EthereumWalletConnectors,DynamicContextProvider } from "@/lib/dynamic";
-
-
+import {
+  DynamicWagmiConnector,
+  EthereumWalletConnectors,
+  DynamicContextProvider,
+} from '@/lib/dynamic';
 
 export const viewport = {
   width: 'device-width',
@@ -36,14 +38,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <DynamicContextProvider
             settings={{
-            environmentId: 'e0aef638-4468-4586-86a9-dc829834f50b',
-            walletConnectors: [EthereumWalletConnectors],  
-          }}
-        >
+              environmentId: 'e0aef638-4468-4586-86a9-dc829834f50b',
+              walletConnectors: [EthereumWalletConnectors],
+            }}
+          >
             <OnchainProviders>
-              <DynamicWagmiConnector>
-                {children}
-              </DynamicWagmiConnector>
+              <DynamicWagmiConnector>{children}</DynamicWagmiConnector>
             </OnchainProviders>
           </DynamicContextProvider>
         </Providers>

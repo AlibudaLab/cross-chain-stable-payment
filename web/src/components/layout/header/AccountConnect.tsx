@@ -4,7 +4,7 @@ import { useAccount, useChainId, useConnect, useDisconnect } from 'wagmi';
 import { AccountDropdown } from './AccountDropdown';
 import { AccountInfoPanel } from './AccountInfoPanel';
 import { useDynamicContext } from '@/lib/dynamic';
-import {DynamicWidget} from '@/lib/dynamic';
+import { DynamicWidget } from '@/lib/dynamic';
 
 /**
  * AccountConnect
@@ -31,11 +31,11 @@ function AccountConnect() {
       })}
     >
       {(() => {
-        return (<DynamicWidget
-        innerButtonComponent={<button>Connect Wallet</button>}
-      >
-        {/* ... rest of your app ... */}
-      </DynamicWidget>);/*(
+        return (
+          <DynamicWidget innerButtonComponent={<button>Connect Wallet</button>}>
+            {/* ... rest of your app ... */}
+          </DynamicWidget>
+        ); /*(
           <>
             <div className="flex flex-grow flex-col md:hidden">
               <AccountInfoPanel />
@@ -45,7 +45,6 @@ function AccountConnect() {
             </div>
           </>
         )*/
-          
       })()}
     </div>
   );

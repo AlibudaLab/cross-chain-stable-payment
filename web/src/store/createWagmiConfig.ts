@@ -11,11 +11,11 @@ export function createWagmiConfig(rpcUrl: string, projectId?: string) {
   return createConfig({
     chains: [baseSepolia, arbitrumSepolia],
     //connectors: [
-      //injected(),
-      // coinbaseWallet({
-      //   appName: 'buildonchainapps',
-      //   preference: 'smartWalletOnly',
-      // }),
+    //injected(),
+    // coinbaseWallet({
+    //   appName: 'buildonchainapps',
+    //   preference: 'smartWalletOnly',
+    // }),
     //],
     multiInjectedProviderDiscovery: false,
     ssr: true,
