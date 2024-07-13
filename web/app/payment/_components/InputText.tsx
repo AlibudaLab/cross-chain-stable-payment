@@ -1,4 +1,16 @@
+import React from 'react';
 import clsx from 'clsx';
+
+type InputTextProps = {
+  id: string;
+  placeholder: string;
+  onChange: (evt: { target: { value: string } }) => void;
+  disabled: boolean;
+  required?: boolean;
+  value: string;
+  type?: string;
+  step?: string;
+};
 
 export default function InputText({
   id,
@@ -6,16 +18,13 @@ export default function InputText({
   onChange,
   disabled,
   required = false,
-}: {
-  id: string;
-  placeholder: string;
-  onChange: (evt: { target: { value: string } }) => void;
-  disabled: boolean;
-  required?: boolean;
-}) {
+  value,
+  type = 'text',
+  step,
+}: InputTextProps) {
   return (
     <input
-      type="text"
+      type={type}
       id={id}
       className={clsx([
         'block w-full rounded-lg border border-gray-600 bg-boat-color-gray-900',
@@ -25,6 +34,8 @@ export default function InputText({
       onChange={onChange}
       disabled={disabled}
       required={required}
+      value={value}
+      step={step}
     />
   );
 }

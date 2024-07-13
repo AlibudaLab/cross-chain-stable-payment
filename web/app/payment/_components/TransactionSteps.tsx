@@ -5,22 +5,20 @@ import { TransactionStates } from './useSmartContractForms';
 
 type TransactionStepsProps = {
   transactionStep: TransactionStates | null;
-  coffeeCount: number;
   gasCost: number;
   resetContractForms: () => void;
 };
 
 export default function TransactionSteps({
   transactionStep,
-  coffeeCount,
   resetContractForms: resetContractForms,
   gasCost,
 }: TransactionStepsProps) {
   if (transactionStep === TransactionStates.START) {
     return (
       <TransactionStep
-        status="Coffee brewing..."
-        icon="☕"
+        status="Request Sending..."
+        icon="🕊️"
         helpText="Please confirm transaction in your wallet"
       >
         <Button
@@ -35,11 +33,11 @@ export default function TransactionSteps({
   if (transactionStep === TransactionStates.COMPLETE) {
     return (
       <TransactionStep
-        status={`You bought ${coffeeCount} coffee${coffeeCount > 1 ? 's' : ''}!`}
+        status="You sent the request for payment!"
         icon="🎁"
-        helpText="Thank you for supporting this endeavor!"
+        helpText="Thank you!"
       >
-        <Button buttonContent="Send another coffee" onClick={resetContractForms} />
+        <Button buttonContent="Send request" onClick={resetContractForms} />
       </TransactionStep>
     );
   }
@@ -51,7 +49,7 @@ export default function TransactionSteps({
         icon="⛽"
         helpText={`Please fund your wallet with at least ${String(
           gasCost,
-        )} ETH and try sending a coffee again.`}
+        )} ETH and try sending a request again.`}
       >
         <Button buttonContent="Got it" onClick={resetContractForms} />
       </TransactionStep>

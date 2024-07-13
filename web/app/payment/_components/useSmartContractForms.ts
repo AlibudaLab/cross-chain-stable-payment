@@ -23,7 +23,7 @@ export default function useSmartContractForms({
   gasFee: bigint;
   contract: UseContractReturn<Abi>;
   name: string;
-  arguments: (number | string)[];
+  arguments: (number | string | bigint)[];
   enableSubmit: boolean;
   reset: AsyncFunction<unknown[], unknown>;
 }) {

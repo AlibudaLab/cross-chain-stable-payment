@@ -1,18 +1,25 @@
+import React from 'react';
 import clsx from 'clsx';
+
+type TextAreaProps = {
+  id: string;
+  placeholder: string;
+  onChange: (evt: { target: { value: string } }) => void;
+  disabled: boolean;
+  required?: boolean;
+  value: string;
+  rows?: number;
+};
 
 export default function TextArea({
   id,
   placeholder,
   onChange,
   disabled,
-  required,
-}: {
-  id: string;
-  placeholder: string;
-  onChange: (evt: { target: { value: string } }) => void;
-  disabled: boolean;
-  required: boolean;
-}) {
+  required = false,
+  value,
+  rows = 4,
+}: TextAreaProps) {
   return (
     <textarea
       id={id}
@@ -24,6 +31,8 @@ export default function TextArea({
       onChange={onChange}
       disabled={disabled}
       required={required}
+      value={value}
+      rows={rows}
     />
   );
 }
