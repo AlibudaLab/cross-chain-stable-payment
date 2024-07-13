@@ -1,5 +1,5 @@
 import { createConfig, http } from 'wagmi';
-import { base, baseSepolia } from 'wagmi/chains';
+import { base, baseSepolia, arbitrumSepolia } from 'wagmi/chains';
 import { /*coinbaseWallet,*/ injected } from 'wagmi/connectors';
 
 export function createWagmiConfig(rpcUrl: string, projectId?: string) {
@@ -13,18 +13,19 @@ export function createWagmiConfig(rpcUrl: string, projectId?: string) {
   const baseSepoliaUrl = rpcUrl.replace(/\/v1\/(.+?)\//, '/v1/base-sepolia/');
 
   return createConfig({
-    chains: [baseSepolia],
-    connectors: [
-      injected(),
+    chains: [baseSepolia, arbitrumSepolia],
+    //connectors: [
+      //injected(),
       // coinbaseWallet({
       //   appName: 'buildonchainapps',
       //   preference: 'smartWalletOnly',
       // }),
-    ],
+    //],
+    multiInjectedProviderDiscovery: false,
     ssr: true,
     transports: {
-      [baseSepolia.id]: http(baseSepoliaUrl),
-      [base.id]: http(baseUrl),
+      [baseSepolia.id]: http(),
+      [arbitrumSepolia.id]: http(),
     },
   });
 }

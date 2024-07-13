@@ -1,8 +1,10 @@
-import { ConnectAccount } from '@coinbase/onchainkit/wallet';
+//import { ConnectAccount } from '@coinbase/onchainkit/wallet';
 import { baseSepolia } from 'viem/chains';
 import { useAccount, useChainId, useConnect, useDisconnect } from 'wagmi';
 import { AccountDropdown } from './AccountDropdown';
 import { AccountInfoPanel } from './AccountInfoPanel';
+import { useDynamicContext } from '@/lib/dynamic';
+import {DynamicWidget} from '@/lib/dynamic';
 
 /**
  * AccountConnect
@@ -29,19 +31,11 @@ function AccountConnect() {
       })}
     >
       {(() => {
-        if (account.status === 'disconnected') {
-          return <ConnectAccount />;
-        }
-
-        if (account.status === 'connected' && chainId !== baseSepolia.id) {
-          return (
-            <button onClick={() => disconnect()} type="button">
-              Wrong network
-            </button>
-          );
-        }
-
-        return (
+        return (<DynamicWidget
+        innerButtonComponent={<button>Connect Wallet</button>}
+      >
+        {/* ... rest of your app ... */}
+      </DynamicWidget>);/*(
           <>
             <div className="flex flex-grow flex-col md:hidden">
               <AccountInfoPanel />
@@ -50,7 +44,8 @@ function AccountConnect() {
               <AccountDropdown />
             </div>
           </>
-        );
+        )*/
+          
       })()}
     </div>
   );
