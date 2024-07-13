@@ -2963,7 +2963,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nextui-org/dropdown@npm:2.1.26":
+"@nextui-org/dropdown@npm:2.1.26, @nextui-org/dropdown@npm:^2.1.26":
   version: 2.1.26
   resolution: "@nextui-org/dropdown@npm:2.1.26"
   dependencies:
@@ -9027,6 +9027,7 @@ __metadata:
     "@coinbase/wallet-sdk": "npm:4.0.0"
     "@farcaster/hub-nodejs": "npm:^0.11.9"
     "@jest/globals": "npm:^29.7.0"
+    "@nextui-org/dropdown": "npm:^2.1.26"
     "@nextui-org/modal": "npm:^2.0.36"
     "@nextui-org/react": "npm:^2.4.2"
     "@nextui-org/select": "npm:^2.2.2"
