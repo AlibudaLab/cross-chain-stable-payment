@@ -1,6 +1,5 @@
 import { createConfig, http } from 'wagmi';
-import { base, baseSepolia, arbitrumSepolia } from 'wagmi/chains';
-import { /*coinbaseWallet,*/ injected } from 'wagmi/connectors';
+import { baseSepolia, arbitrumSepolia } from 'wagmi/chains';
 
 export function createWagmiConfig(rpcUrl: string, projectId?: string) {
   // Keep this till we fully deprecated RK inside the template

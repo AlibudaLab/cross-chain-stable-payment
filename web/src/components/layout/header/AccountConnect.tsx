@@ -1,9 +1,4 @@
-//import { ConnectAccount } from '@coinbase/onchainkit/wallet';
-import { baseSepolia } from 'viem/chains';
-import { useAccount, useChainId, useConnect, useDisconnect } from 'wagmi';
-import { AccountDropdown } from './AccountDropdown';
-import { AccountInfoPanel } from './AccountInfoPanel';
-import { useDynamicContext } from '@/lib/dynamic';
+import { useConnect} from 'wagmi';
 import { DynamicWidget } from '@/lib/dynamic';
 
 /**
@@ -13,10 +8,7 @@ import { DynamicWidget } from '@/lib/dynamic';
  *  - Displays the wallet network
  */
 function AccountConnect() {
-  const account = useAccount();
   const { status } = useConnect();
-  const { disconnect } = useDisconnect();
-  const chainId = useChainId();
 
   return (
     <div
