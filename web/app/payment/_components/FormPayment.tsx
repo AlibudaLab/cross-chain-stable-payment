@@ -14,9 +14,9 @@ import {
 } from '@nextui-org/react';
 import { useSearchParams } from 'next/navigation';
 import QRCode from 'react-qr-code';
-import { parseEther, formatUnits, parseUnits } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 import { useAccount } from 'wagmi';
-import { useBuyMeACoffeeContract } from '../_contracts/useBuyMeACoffeeContract';
+import { useTokenPortContract } from '../_contracts/useTokenPortContract';
 import useERC20Allowance from '../_hooks/useERC20Allowance';
 import useERC20Balance from '../_hooks/useERC20Balance';
 import useFields from '../_hooks/useFields';
@@ -34,7 +34,6 @@ const GAS_COST = 0;
 // address token, default USDC
 // uint256 amount
 const initFields = {
-  sender: '',
   receiver: '',
   sourceChain: SupportedChains.base,
   destinationChain: SupportedChains.arbitrum,
@@ -42,7 +41,6 @@ const initFields = {
 };
 
 type Fields = {
-  sender: string;
   receiver: string;
   sourceChain: SupportedChains;
   destinationChain: SupportedChains;
@@ -61,7 +59,7 @@ function FormPayment() {
     onOpenChange: onReceiveOpenChange,
   } = useDisclosure();
 
-  const contract = useBuyMeACoffeeContract();
+  const contract = useTokenPortContract();
 
   const { fields, setField, resetFields } = useFields<Fields>(initFields);
 
@@ -86,15 +84,10 @@ function FormPayment() {
   };
 
   useEffect(() => {
-    if (fields.sender === '' && address !== undefined) {
-      setField('sender', address as string);
-    }
-
     if (fields.receiver === '' && address !== undefined) {
       setField('receiver', address as string);
     }
-  }, [address, fields.receiver, fields.sender, setField]);
-
+  }, [address, fields.receiver, setField]);
 
   useEffect(() => {
     const receiverAddr = searchParams.get('address');
@@ -116,13 +109,12 @@ function FormPayment() {
     resetFields();
   }, [resetFields]);
 
-  const { transactionState, resetContractForms /*, onSubmitTransaction, disabled*/ } =
+  const { transactionState, resetContractForms, onSubmitTransaction, disabled } =
     useSmartContractForms({
-      gasFee: parseEther(String(GAS_COST * fields.amount)),
       contract,
-      name: 'buyCoffee',
-      arguments: [],
-      enableSubmit: fields.sender !== '',
+      name: 'sendMessage',
+      arguments: [fields.destinationChain, fields.receiver, 'ETHBrussels LFG', '', fields.amount],
+      enableSubmit: fields.receiver !== '' && fields.amount > 0,
       reset,
     });
 
@@ -151,6 +143,7 @@ function FormPayment() {
       'to',
       fields.destinationChain,
     );
+    onSubmitTransaction();
     setIsSendModalOpen(false);
   }, [fields]);
 
@@ -177,7 +170,7 @@ function FormPayment() {
       shortcut: 'arbitrumSepolia',
       label: 'Arbitrum Sepolia',
       ccipChainId: '3478487238524512106',
-      tokenAddress: "",
+      tokenAddress: '',
       balance: 63,
     },
     {
@@ -185,7 +178,7 @@ function FormPayment() {
       shortcut: 'baseSepolia',
       label: 'Base Sepolia',
       ccipChainId: '10344971235874465080',
-      tokenAddress: "",
+      tokenAddress: '',
       balance: 45,
     },
   ];
@@ -324,24 +317,28 @@ function FormPayment() {
               </Select>
             </ModalBody>
             <ModalFooter>
-              {
-              requireAllowance ? (
-              <StepApprove
-                asset='usdc'
-                amount={fields.amount}
-                expectedChain={fields.sourceChain}
-                onSuccess={approveSuccess}
-              /> ) : (
+              {requireAllowance ? (
+                <StepApprove
+                  asset="usdc"
+                  amount={fields.amount}
+                  expectedChain={fields.sourceChain}
+                  onSuccess={approveSuccess}
+                />
+              ) : (
                 <>
-              <Button color="primary" onPress={handleSend} className="w-full">
-                Send
-              </Button>
-              <Button color="danger" variant="light" onPress={handleReject} className="w-full">
-                Reject
-              </Button> 
-              </>
-              )
-              }
+                  <Button
+                    color="primary"
+                    onPress={handleSend}
+                    className="w-full"
+                    isDisabled={disabled}
+                  >
+                    Send
+                  </Button>
+                  <Button color="danger" variant="light" onPress={handleReject} className="w-full">
+                    Reject
+                  </Button>
+                </>
+              )}
             </ModalFooter>
           </>
         </ModalContent>
