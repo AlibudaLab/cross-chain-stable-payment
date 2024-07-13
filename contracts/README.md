@@ -1,89 +1,77 @@
-## Contracts
+# Contracts
 
-This project is built using Foundry. For more information, visit the docs [here](https://book.getfoundry.sh/)
-
-# Disclaimer
-
-The provided Solidity contracts are intended solely for educational purposes and are
-not warranted for any specific use. They have not been audited and may contain vulnerabilities, hence should
-not be deployed in production environments. Users are advised to seek professional review and conduct a
-comprehensive security audit before any real-world application to mitigate risks of financial loss or other
-consequences. The author(s) disclaim all liability for any damages arising from the use of these contracts.
-Use at your own risk, acknowledging the inherent risks of smart contract technology on the blockchain.
-
-# Contents
-
-- [Introduction](#introduction)
-  - [Contracts](#contracts)
-    - [BuyMeACoffee](#buymeacoffee)
-    - [CustomERC1155](#customerc1155)
-    - [AllowlistNFT](#allowlistnft)
-- [Project Layout](#project-layout)
-- [Usage](#usage)
-- [Deploying your own contract](#deploying-your-own-contract)
-- [Deploying to local node](#deploy-to-local-node)
-- [Contributing](#contributing)
+This directory host the smart contract that enables cross chain stable asset payment.
 
 ## Introduction
 
 ### Contracts
 
-#### BuyMeACoffee
+## Dev Note
 
-This repository contains a sample `BuyMeACoffee.sol` contract which allows the user to buy the owner a coffee with `0.001 ether`. Along with that the user can send the owner a memo.
+- source chain: base sepolia
+- desitination chain: arbitrum sepolia
 
-#### CustomERC1155
+### Set env vars
 
-It also contains a sample implementation (`CustomERC1155.sol`) of ERC1155 using openzeppelin's [ERC1155 contract](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/IERC1155.sol)
+- PRIVATE_KEY
+- BASE_SEPOLIA_RPC_URL
+- ARBITRUM_SEPOLIA_RPC_URL
 
-#### AllowlistNFT
+### Deploy / Fund token port on source chain
 
-Contract that allows a user to mint a ERC721A either from a allowlist or from a public mint. This is useful for mints where you want to allow specified users to have early access and (optionally) a lower mint price. After your defined allowlist window ends, the public mint will begin immediately. This contract uses [ERC721A](https://github.com/chiru-labs/ERC721A) as base to allow for more efficient minting of multiple NFTs in a single transaction.
-
-It also makes use of the following utility libraries for allowlist proof verification:
-
-1. [solady MerkleProofLib](https://github.com/Vectorized/solady/blob/main/src/utils/MerkleProofLib.sol): To verify proofs when minting.
-2. [murky](https://github.com/dmfxyz/murky): To easily generate merkle roots and proofs in unit tests.
-
-Deploy Instructions:
-A deploy script `AllowlistNFT.s.sol` is provided. Please be sure to update all of the constructor arguments before deploying:
-
-1. `name`: The name of your NFT collection.
-2. `ticker`: The ticker of your NFT collection.
-3. `allowlistRoot`: The allowlist root generated for your allowlisted addresses. For information on generating merkle roots for allowlists, you can read about this in-depth guide [here](https://medium.com/@ItsCuzzo/using-merkle-trees-for-nft-allowlists-523b58ada3f9)
-4. `maxSupply`: The maximum number of NFTs in your collection.
-5. `price`: The price of a public mint.
-6. `allowlistPrice`: The price of a allowlist mint.
-7. `allowlistOpen`: The timestamp in which allowlist mint begins.
-8. `allowlistClose`: The timestamp in which allowlist mint ends. Note: Public mint will begin immediately after `allowlistClose`.
-9. `maxAllowlistMint`: The maximum number of NFTs a allowlisted address can allowlist mint.
-10. `maxPublicMint`: The maximum number of NFTs an address can public mint.
-11. `uri`: The base URI of your NFT. This is your IPFS hash.
-
-### Project Layout
+deploy and send init fund to the token port contract on Base sepolia
 
 ```
-.
-├── foundry.toml
-├── script
-│   └── BuyMeACoffee.s.sol
-│   └── CustomERC155.s.sol
-│   └── AllowlistNFT.s.sol
-├── src
-│   └── BuyMeACoffee.sol
-│    └── CustomERC155.sol
-│   └── AllowlistNFT.sol
-└── test
-    └── BuyMeACoffee.t.sol
-    └── CustomERC155.t.sol
-    └── AllowlistNFT.t.sol
-
+forge script ./script/00_TokenPort.s.sol:DeployTokenPort -vvv --broadcast --rpc-url base_sepolia --sig "run(uint8, uint256)" -- 6 0.01ether
 ```
 
-- You can configure Foundry's behavior using foundry.toml.
-- The default directory for contracts is src/.
-- The default directory for tests is test/
-- The default directory for writing scripts is script/
+command to send more fund to the contract
+
+```
+cast send <TOKEN_PORT_ADDRESS> --rpc-url base_sepolia --private-key=$PRIVATE_KEY --value 0.05ether
+```
+
+### Deploy token port on destination chain
+
+deploy and send init fund to the token port contract on Arbitrum sepolia
+
+```
+forge script ./script/00_TokenPort.s.sol:DeployTokenPort -vvv --broadcast --rpc-url arbitrum_sepolia --sig "run(uint8, uint256)" -- 2 0.01ether
+```
+
+command to send more fund to the contract
+
+```
+cast send <TOKEN_PORT_ADDRESS> --rpc-url arbitrum_sepolia --private-key=$PRIVATE_KEY --value 0.05ether
+```
+
+### Send token (USDC) from source chain
+
+```
+forge script ./script/SendToken.s.sol:SendToken -vvv --broadcast --rpc-url base_sepolia --sig "run(address,uint8,address,string,address,uint256)" -- 0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD 2 0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD "LFG" 0x036CbD53842c5426634e7929541eC2318f3dCF7e 100
+```
+
+### Verify receive on the destination chain
+
+```
+cast call 0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD "getLastReceivedMessageDetails()" --rpc-url arbitrum_sepolia
+```
+
+### withdraw token from the token port
+
+```
+cast send 0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD "withdraw(address)" 0x643768330dD3C34DBFe7c842fF3776A0A69A4d24 --rpc-url arbitrum_sepolia --private-key $PRIVATE_KEY
+```
+
+### Deployed contracts
+
+**Base Sepolia**
+
+- TokenPort.sol: 0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD
+
+**Arbitrum Sepolia**
+
+- TokenPort.sol: 0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD
 
 ## Usage
 
@@ -176,23 +164,6 @@ To extract the `abi` of your contract, you can go to `out/BuyMeACoffee.sol/BuyMe
 
 7. To extract the `abi` of your contract, you can go to `out/YOUR_CONTRACT.sol/YOUR_CONTRACT.json` and copy the value corresponding to the `abi` key
 
-## Deploy to local node
-
-Initially, building on a local node can offer numerous benefits, including:
-
-- The ability to add debug statements.
-- The capability to fork a chain at a particular block, enabling the detection of reasons behind specific behaviors.
-- The absence of the need for testnet/mainnet funds.
-- Faster testing, as only your node is responsible for consensus.
-
-You can deploy your contracts to local node for faster testing as follows:
-
-```bash
-make local-node
-```
-
-![anvil](./assets/anvil.png)
-
 To deploy the contract:
 
 - Make sure to delete the following lines from `foundry.toml` because locally we dont have a block explorer
@@ -213,29 +184,3 @@ To deploy the contract:
 ![local-deployment](./assets/local-deployment.png)
 
 You can observe that the console2 library facilitates the addition of console logs in the contract, which would not have been possible if you were deploying to a testnet or mainnet.
-
-## Contributing
-
-If you would like to contribute to contracts folder, follow the given steps for setup
-
-### Installation
-
-Install foundry using
-
-```shell
-curl -L https://foundry.paradigm.xyz | bash
-foundryup
-```
-
-Follow the instructions of foundryup to completely setup foundry
-
-### Install dependencies
-
-Run the following commands inside the contracts folder:
-
-```shell
-forge install
-forge build
-```
-
-You should be good to go :) Thank you for the support ❤️
