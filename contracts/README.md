@@ -48,30 +48,30 @@ cast send <TOKEN_PORT_ADDRESS> --rpc-url arbitrum_sepolia --private-key=$PRIVATE
 ### Send token (USDC) from source chain
 
 ```
-forge script ./script/SendToken.s.sol:SendToken -vvv --broadcast --rpc-url base_sepolia --sig "run(address,uint8,address,string,address,uint256)" -- 0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD 2 0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD "LFG" 0x036CbD53842c5426634e7929541eC2318f3dCF7e 100
+forge script ./script/SendToken.s.sol:SendToken -vvv --broadcast --rpc-url base_sepolia --sig "run(address,uint8,address,string,address,uint256)" -- 0xfa4b5afe76f6ff8a90fb983e94303c976a21fb9d 2 0x7abc649afba6ffc0fa867d0d32e8e655d3987187 "LFG" 0x036CbD53842c5426634e7929541eC2318f3dCF7e 100
 ```
 
 ### Verify receive on the destination chain
 
 ```
-cast call 0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD "getLastReceivedMessageDetails()" --rpc-url arbitrum_sepolia
+cast call 0x7abc649afba6ffc0fa867d0d32e8e655d3987187 "getLastReceivedMessageDetails()" --rpc-url arbitrum_sepolia
 ```
 
 ### withdraw token from the token port
 
 ```
-cast send 0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD "withdraw(address)" 0x643768330dD3C34DBFe7c842fF3776A0A69A4d24 --rpc-url arbitrum_sepolia --private-key $PRIVATE_KEY
+cast send 0x7abc649afba6ffc0fa867d0d32e8e655d3987187 "withdraw(address)" 0x643768330dD3C34DBFe7c842fF3776A0A69A4d24 --rpc-url arbitrum_sepolia --private-key $PRIVATE_KEY
 ```
 
 ### Deployed contracts
 
 **Base Sepolia**
 
-- TokenPort.sol: 0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD
+- TokenPort.sol: [0xfa4b5afe76f6ff8a90fb983e94303c976a21fb9d](https://sepolia.basescan.org/address/0xfa4b5afe76f6ff8a90fb983e94303c976a21fb9d)
 
 **Arbitrum Sepolia**
 
-- TokenPort.sol: 0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD
+- TokenPort.sol: [0x7abc649afba6ffc0fa867d0d32e8e655d3987187](https://sepolia.arbiscan.io/address/0x7abc649afba6ffc0fa867d0d32e8e655d3987187)
 
 ## Usage
 
