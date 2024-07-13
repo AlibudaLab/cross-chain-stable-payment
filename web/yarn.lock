@@ -3222,7 +3222,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nextui-org/button@npm:2.0.34":
+"@nextui-org/button@npm:2.0.34, @nextui-org/button@npm:^2.0.34":
   version: 2.0.34
   resolution: "@nextui-org/button@npm:2.0.34"
   dependencies:
@@ -9886,6 +9886,7 @@ __metadata:
     "@dynamic-labs/wagmi-connector": "npm:^2.3.1"
     "@farcaster/hub-nodejs": "npm:^0.11.9"
     "@jest/globals": "npm:^29.7.0"
+    "@nextui-org/button": "npm:^2.0.34"
     "@nextui-org/dropdown": "npm:^2.1.26"
     "@nextui-org/modal": "npm:^2.0.36"
     "@nextui-org/react": "npm:^2.4.2"
@@ -9951,6 +9952,7 @@ __metadata:
     prettier-plugin-tailwindcss: "npm:^0.5.9"
     react: "npm:^18"
     react-dom: "npm:^18"
+    react-hot-toast: "npm:^2.4.1"
     react-qr-code: "npm:^2.0.15"
     react-remove-scroll: "npm:^2.5.7"
     rehype-pretty-code: "npm:0.12.3"
@@ -12158,6 +12160,15 @@ __metadata:
   version: 0.1.4
   resolution: "globjoin@npm:0.1.4"
   checksum: 10c0/236e991b48f1a9869fe2aa7bb5141fb1f32973940567a3c012f8ccb58c3c85ab78ce594d374fa819410fff3b48cfd24584d7ef726939f8a3c3772890e62ea16b
+  languageName: node
+  linkType: hard
+
+"goober@npm:^2.1.10":
+  version: 2.1.14
+  resolution: "goober@npm:2.1.14"
+  peerDependencies:
+    csstype: ^3.0.10
+  checksum: 10c0/184eda787a9a14cffbaa8284e98dc127095e538b4acab2a84b81babca84253bb883e16208822e02584f27c7a69f3ec47341e5060dfa40a0e07c32ac1f79b2714
   languageName: node
   linkType: hard
 
