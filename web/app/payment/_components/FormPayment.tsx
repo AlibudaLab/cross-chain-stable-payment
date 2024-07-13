@@ -42,13 +42,13 @@ function FormPayment() {
 
   const contract = useBuyMeACoffeeContract();
 
-  const { fields, setField, resetFields } = useFields<Fields>(initFields);
+  const { fields, /*setField,*/ resetFields } = useFields<Fields>(initFields);
 
   const reset = useCallback(async () => {
     resetFields();
   }, [resetFields]);
 
-  const { disabled, transactionState, resetContractForms, onSubmitTransaction } =
+  const { transactionState, resetContractForms/*, onSubmitTransaction, disabled*/ } =
     useSmartContractForms({
       gasFee: parseEther(String(GAS_COST * fields.coffeeCount)),
       contract,
