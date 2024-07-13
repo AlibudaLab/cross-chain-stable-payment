@@ -37,7 +37,7 @@ export function NavbarTitle() {
         className="font-robotoMono text-center text-xl font-medium text-white no-underline"
         aria-label="build-onchain-apps Github repository"
       >
-        PAYME
+        ABSTRACTED USDC PAYMENTS
       </NextLink>
     </div>
   );

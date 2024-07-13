@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Banner from '@/components/layout/banner/banner';
 import Header from '@/components/layout/header/Header';
 import Main from '@/components/layout/Main';
 import PaymentDemo from './_components/ContractDemo';
@@ -26,7 +25,6 @@ export default function BuyMeCoffeePage() {
     <>
       <Header />
       <Main>
-        <Banner pageName="Receive Payment" pageUrl="payment/receive" />
         <PaymentDemo />
       </Main>
     </>

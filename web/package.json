@@ -21,6 +21,7 @@
     "@coinbase/onchainkit": "^0.19.7",
     "@coinbase/wallet-sdk": "4.0.0",
     "@farcaster/hub-nodejs": "^0.11.9",
+    "@nextui-org/dropdown": "^2.1.26",
     "@nextui-org/modal": "^2.0.36",
     "@nextui-org/react": "^2.4.2",
     "@nextui-org/select": "^2.2.2",

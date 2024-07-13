@@ -1,11 +1,10 @@
 import { generateMetadata } from '@/utils/generateMetadata';
 
 export const metadata = generateMetadata({
-  title: 'Buy me a coffee - BOAT',
-  description:
-    'Save weeks of initial app setup and the hassle of integrating onchain components with web2 infrastructure.',
+  title: 'Abstracted USDC Payments',
+  description: 'Abstracted USDC Payments',
   images: 'themes.png',
-  pathname: 'buy-me-coffee',
+  pathname: 'payment',
 });
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
