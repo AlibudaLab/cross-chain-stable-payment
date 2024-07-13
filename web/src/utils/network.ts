@@ -1,5 +1,5 @@
-import { SupportedChains } from 'app/payment/constants';
 import { arbitrumSepolia, baseSepolia } from 'viem/chains';
+import { SupportedChains } from '../../app/payment/constants';
 
 const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 
