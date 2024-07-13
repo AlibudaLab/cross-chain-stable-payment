@@ -4,6 +4,7 @@ import GoogleAnalytics from '@/components/GoogleAnalytics/GoogleAnalytics';
 import OnchainProviders from '@/OnchainProviders';
 import { initAnalytics } from '@/utils/analytics';
 import { inter } from './fonts';
+import { Providers } from './providers';
 import type { Metadata } from 'next';
 
 export const viewport = {
@@ -27,9 +28,11 @@ initAnalytics();
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.className}`}>
+    <html lang="en" className={`${inter.className} dark`}>
       <body className="flex flex-1 flex-col">
-        <OnchainProviders>{children}</OnchainProviders>
+        <Providers>
+          <OnchainProviders>{children}</OnchainProviders>
+        </Providers>
       </body>
       <GoogleAnalytics />
     </html>

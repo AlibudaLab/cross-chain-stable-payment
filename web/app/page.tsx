@@ -16,5 +16,5 @@ export const metadata = generateMetadata({
  * https://nextjs.org/docs/app/building-your-application/rendering/client-components
  */
 export default function Page() {
-  redirect('/payment/send');
+  redirect('/payment');
 }
