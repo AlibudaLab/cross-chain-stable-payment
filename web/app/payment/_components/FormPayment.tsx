@@ -14,13 +14,14 @@ import {
 } from '@nextui-org/react';
 import { useSearchParams } from 'next/navigation';
 import QRCode from 'react-qr-code';
-import { parseEther, formatUnits } from 'viem';
+import { parseEther, formatUnits, parseUnits } from 'viem';
 import { useAccount } from 'wagmi';
 import { useBuyMeACoffeeContract } from '../_contracts/useBuyMeACoffeeContract';
-//import useERC20Allowance from '../_hooks/useERC20Allowance';
+import useERC20Allowance from '../_hooks/useERC20Allowance';
 import useERC20Balance from '../_hooks/useERC20Balance';
 import useFields from '../_hooks/useFields';
 import { SupportedChains } from '../constants';
+import StepApprove from './StepApprove';
 import TransactionSteps from './TransactionSteps';
 import useSmartContractForms from './useSmartContractForms';
 
@@ -37,7 +38,7 @@ const initFields = {
   receiver: '',
   sourceChain: SupportedChains.base,
   destinationChain: SupportedChains.arbitrum,
-  amount: 0,
+  amount: 10,
 };
 
 type Fields = {
@@ -65,9 +66,14 @@ function FormPayment() {
   const { fields, setField, resetFields } = useFields<Fields>(initFields);
 
   const { balance } = useERC20Balance('usdc', fields.destinationChain);
-
   console.log('Balance:', balance);
-  //const { allowance, refetchAllowance } = useERC20Allowance('usdc', fields.sourceChain);
+  const { allowance, refetchAllowance } = useERC20Allowance('usdc', fields.sourceChain);
+  const requireAllowance = (allowance ?? BigInt(0)) < parseUnits(fields.amount.toString(), 6);
+  console.log('Allowance:', allowance);
+
+  const approveSuccess = useCallback(async () => {
+    await refetchAllowance();
+  }, [refetchAllowance]);
 
   const chainMap: Record<string, SupportedChains> = {
     arbitrumSepolia: SupportedChains.arbitrum,
@@ -78,6 +84,17 @@ function FormPayment() {
   const mapShortcutToChainKey = (shortcut: string): SupportedChains => {
     return chainMap[shortcut] ?? SupportedChains.base; // Default to base if not found
   };
+
+  useEffect(() => {
+    if (fields.sender === '' && address !== undefined) {
+      setField('sender', address as string);
+    }
+
+    if (fields.receiver === '' && address !== undefined) {
+      setField('receiver', address as string);
+    }
+  }, [address, fields.receiver, fields.sender, setField]);
+
 
   useEffect(() => {
     const receiverAddr = searchParams.get('address');
@@ -94,18 +111,6 @@ function FormPayment() {
       setIsSendModalOpen(true);
     }
   }, [searchParams, setField]);
-
-  useEffect(() => {
-    if (address) {
-      setField('sender', address);
-    }
-  }, [address, setField]);
-
-  useEffect(() => {
-    if (fields.receiver === '' && address !== undefined) {
-      setField('receiver', address as string);
-    }
-  }, [address, fields.receiver, setField]);
 
   const reset = useCallback(async () => {
     resetFields();
@@ -172,6 +177,7 @@ function FormPayment() {
       shortcut: 'arbitrumSepolia',
       label: 'Arbitrum Sepolia',
       ccipChainId: '3478487238524512106',
+      tokenAddress: "",
       balance: 63,
     },
     {
@@ -179,6 +185,7 @@ function FormPayment() {
       shortcut: 'baseSepolia',
       label: 'Base Sepolia',
       ccipChainId: '10344971235874465080',
+      tokenAddress: "",
       balance: 45,
     },
   ];
@@ -317,12 +324,24 @@ function FormPayment() {
               </Select>
             </ModalBody>
             <ModalFooter>
+              {
+              requireAllowance ? (
+              <StepApprove
+                asset='usdc'
+                amount={fields.amount}
+                expectedChain={fields.sourceChain}
+                onSuccess={approveSuccess}
+              /> ) : (
+                <>
               <Button color="primary" onPress={handleSend} className="w-full">
                 Send
               </Button>
               <Button color="danger" variant="light" onPress={handleReject} className="w-full">
                 Reject
-              </Button>
+              </Button> 
+              </>
+              )
+              }
             </ModalFooter>
           </>
         </ModalContent>
