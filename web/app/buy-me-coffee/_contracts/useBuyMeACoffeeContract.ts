@@ -1,15 +1,15 @@
 import { baseSepolia } from 'viem/chains';
 import { generateContractHook } from '@/hooks/contracts';
-import TokenPortABI from './TokenPortABI';
+import BuyMeACoffeeABI from './BuyMeACoffeeABI';
 
 /**
  * Returns contract data for the BuyMeACoffee contract.
  */
-export const useTokenPortContract = generateContractHook({
-  abi: TokenPortABI,
+export const useBuyMeACoffeeContract = generateContractHook({
+  abi: BuyMeACoffeeABI,
   [baseSepolia.id]: {
     chain: baseSepolia,
-    address: '0x0c7D4Ae8ad01e521cE44d3aee1ce9acd59EE73eD',
+    address: '0xcE0EBD0282e247553eb8fDdeE3281b5EC09ddD16',
   },
 
   // ... more chains for this contract go here
