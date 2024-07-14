@@ -1,7 +1,6 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { OnchainKitProvider } from '@coinbase/onchainkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { WagmiProvider } from 'wagmi';

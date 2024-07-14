@@ -24,7 +24,7 @@ function AccountConnect() {
     >
       {(() => {
         return (
-          <DynamicWidget innerButtonComponent={<button>Connect Wallet</button>}>
+          <DynamicWidget innerButtonComponent={<button type="button">Connect Wallet</button>}>
             {/* ... rest of your app ... */}
           </DynamicWidget>
         ); /*(

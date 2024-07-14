@@ -1,16 +1,16 @@
 import './global.css';
 
 import GoogleAnalytics from '@/components/GoogleAnalytics/GoogleAnalytics';
-import OnchainProviders from '@/OnchainProviders';
-import { initAnalytics } from '@/utils/analytics';
-import { inter } from './fonts';
-import { Providers } from './providers';
-import type { Metadata } from 'next';
 import {
   DynamicWagmiConnector,
   EthereumWalletConnectors,
   DynamicContextProvider,
 } from '@/lib/dynamic';
+import OnchainProviders from '@/OnchainProviders';
+import { initAnalytics } from '@/utils/analytics';
+import { inter } from './fonts';
+import { Providers } from './providers';
+import type { Metadata } from 'next';
 
 export const viewport = {
   width: 'device-width',
