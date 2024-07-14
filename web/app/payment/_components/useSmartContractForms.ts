@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Abi, TransactionExecutionError } from 'viem';
 import { useSimulateContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { UseContractReturn } from '@/hooks/contracts';
-import { useLoggedInUserCanAfford } from '@/hooks/useUserCanAfford';
 
 export enum TransactionStates {
   START,
@@ -13,14 +12,12 @@ export enum TransactionStates {
 type AsyncFunction<Args extends unknown[], ReturnType> = (...args: Args) => Promise<ReturnType>;
 
 export default function useSmartContractForms({
-  gasFee,
   contract,
   name: functionName,
   arguments: args,
   enableSubmit: isValid,
   reset,
 }: {
-  gasFee: bigint;
   contract: UseContractReturn<Abi>;
   name: string;
   arguments: (number | string)[];
@@ -28,8 +25,6 @@ export default function useSmartContractForms({
   reset: AsyncFunction<unknown[], unknown>;
 }) {
   const [transactionState, setTransactionState] = useState<TransactionStates | null>(null);
-
-  const canAfford = useLoggedInUserCanAfford(gasFee);
 
   const { data: contractRequest } = useSimulateContract({
     address: contract.status === 'ready' ? contract.address : undefined,
@@ -39,7 +34,6 @@ export default function useSmartContractForms({
     query: {
       enabled: isValid && contract.status === 'ready',
     },
-    value: gasFee,
   });
 
   const {
@@ -56,7 +50,7 @@ export default function useSmartContractForms({
     },
   });
 
-  const disabled = contract.status !== 'ready' || writeContractStatus === 'pending' || !canAfford;
+  const disabled = contract.status !== 'ready' || writeContractStatus === 'pending';
 
   const onSubmitTransaction = useCallback(
     (event: { preventDefault: () => void }) => {
