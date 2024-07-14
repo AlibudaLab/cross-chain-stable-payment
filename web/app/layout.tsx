@@ -1,6 +1,11 @@
 import './global.css';
 
 import GoogleAnalytics from '@/components/GoogleAnalytics/GoogleAnalytics';
+import {
+  DynamicWagmiConnector,
+  EthereumWalletConnectors,
+  DynamicContextProvider,
+} from '@/lib/dynamic';
 import OnchainProviders from '@/OnchainProviders';
 import { initAnalytics } from '@/utils/analytics';
 import { inter } from './fonts';
@@ -31,7 +36,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.className} dark`}>
       <body className="flex flex-1 flex-col">
         <Providers>
-          <OnchainProviders>{children}</OnchainProviders>
+          <DynamicContextProvider
+            settings={{
+              environmentId: 'e0aef638-4468-4586-86a9-dc829834f50b',
+              walletConnectors: [EthereumWalletConnectors],
+            }}
+          >
+            <OnchainProviders>
+              <DynamicWagmiConnector>{children}</DynamicWagmiConnector>
+            </OnchainProviders>
+          </DynamicContextProvider>
         </Providers>
       </body>
       <GoogleAnalytics />

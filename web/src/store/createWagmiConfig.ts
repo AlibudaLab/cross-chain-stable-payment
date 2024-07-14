@@ -1,8 +1,5 @@
 import { createConfig, http } from 'wagmi';
-import { arbitrumSepolia, baseSepolia } from 'wagmi/chains';
-import { injected } from 'wagmi/connectors';
-import { sourceChainToRPC } from '@/utils/network';
-import { SupportedChains } from '../../app/payment/constants';
+import { baseSepolia, arbitrumSepolia } from 'wagmi/chains';
 
 export function createWagmiConfig(rpcUrl: string, projectId?: string) {
   // Keep this till we fully deprecated RK inside the template
@@ -12,11 +9,18 @@ export function createWagmiConfig(rpcUrl: string, projectId?: string) {
 
   return createConfig({
     chains: [baseSepolia, arbitrumSepolia],
-    connectors: [injected()],
+    //connectors: [
+    //injected(),
+    // coinbaseWallet({
+    //   appName: 'buildonchainapps',
+    //   preference: 'smartWalletOnly',
+    // }),
+    //],
+    multiInjectedProviderDiscovery: false,
     ssr: true,
     transports: {
-      [baseSepolia.id]: http(sourceChainToRPC(SupportedChains.base)),
-      [arbitrumSepolia.id]: http(sourceChainToRPC(SupportedChains.arbitrum)),
+      [baseSepolia.id]: http(),
+      [arbitrumSepolia.id]: http(),
     },
   });
 }
