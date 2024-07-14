@@ -19,7 +19,6 @@ import { useAccount } from 'wagmi';
 import { useTokenPortContract } from '../_contracts/useTokenPortContract';
 import useERC20Allowance from '../_hooks/useERC20Allowance';
 import useERC20Balance from '../_hooks/useERC20Balance';
-import useFields from '../_hooks/useFields';
 import { SupportedChains } from '../constants';
 import StepApprove from './StepApprove';
 import TransactionSteps from './TransactionSteps';
@@ -27,6 +26,25 @@ import useSmartContractForms from './useSmartContractForms';
 
 const BASE_URL = 'http://localhost:3000/payment';
 const GAS_COST = 0;
+
+const chains = [
+  {
+    key: SupportedChains.arbitrum,
+    shortcut: 'arbitrumSepolia',
+    label: 'Arbitrum Sepolia',
+    ccipChainId: '3478487238524512106',
+    tokenAddress: '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d',
+    balance: 63,
+  },
+  {
+    key: SupportedChains.base,
+    shortcut: 'baseSepolia',
+    label: 'Base Sepolia',
+    ccipChainId: '10344971235874465080',
+    tokenAddress: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+    balance: 45,
+  },
+];
 
 // uint64 destinationChainSelector,
 // address receiver,
@@ -37,7 +55,7 @@ const initFields = {
   receiver: '',
   sourceChain: SupportedChains.base,
   destinationChain: SupportedChains.arbitrum,
-  amount: 10,
+  amount: 0,
 };
 
 type Fields = {
@@ -52,6 +70,7 @@ function FormPayment() {
   const [showQRCode, setShowQRCode] = useState(false);
   const searchParams = useSearchParams();
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+  const [fields, setFields] = useState(initFields);
 
   const {
     isOpen: isReceiveOpen,
@@ -61,13 +80,9 @@ function FormPayment() {
 
   const contract = useTokenPortContract();
 
-  const { fields, setField, resetFields } = useFields<Fields>(initFields);
-
   const { balance } = useERC20Balance('usdc', fields.destinationChain);
-  console.log('Balance:', balance);
   const { allowance, refetchAllowance } = useERC20Allowance('usdc', fields.sourceChain);
   const requireAllowance = (allowance ?? BigInt(0)) < parseUnits(fields.amount.toString(), 6);
-  console.log('Allowance:', allowance);
 
   const approveSuccess = useCallback(async () => {
     await refetchAllowance();
@@ -85,37 +100,35 @@ function FormPayment() {
 
   useEffect(() => {
     if (fields.receiver === '' && address !== undefined) {
-      setField('receiver', address as string);
+      setFields((prevFields: Fields) => ({ ...prevFields, receiver: address as string }));
     }
-  }, [address, fields.receiver, setField]);
+  }, [address, fields.receiver]);
 
   useEffect(() => {
+    console.log('searchParams:', searchParams);
     const receiverAddr = searchParams.get('address');
     const amount = searchParams.get('amount');
     const destinationChainShortcut = searchParams.get('destinationChain');
 
-    if (receiverAddr && amount && destinationChainShortcut) {
-      setField('receiver', receiverAddr);
-      setField('amount', Number(amount));
-
-      const destinationChainKey = mapShortcutToChainKey(destinationChainShortcut);
-      setField('destinationChain', destinationChainKey);
-
+    if (receiverAddr || amount || destinationChainShortcut) {
+      setFields((prevFields: Fields) => ({
+        ...prevFields,
+        ...(receiverAddr&&{ receiver: receiverAddr!}),
+        ...(amount &&{amount: Number(amount)}),
+        ...(destinationChainShortcut && {destinationChain: mapShortcutToChainKey(destinationChainShortcut!)}),
+      }));
+  
       setIsSendModalOpen(true);
     }
-  }, [searchParams, setField]);
+  }, [searchParams]);
 
-  const reset = useCallback(async () => {
-    resetFields();
-  }, [resetFields]);
-
+  const chainInfo:any = chains.find((chain) => chain.key === fields.destinationChain); 
   const { transactionState, resetContractForms, onSubmitTransaction, disabled } =
-    useSmartContractForms({
+  useSmartContractForms({
       contract,
       name: 'sendMessage',
-      arguments: [fields.destinationChain, fields.receiver, 'ETHBrussels LFG', '', fields.amount],
-      enableSubmit: fields.receiver !== '' && fields.amount > 0,
-      reset,
+      arguments: [BigInt(chainInfo?.ccipChainId!), fields.receiver, 'ETHBrussels LFG', chainInfo?.tokenAddress, BigInt(fields.amount)*(10n**6n)],
+      enableSubmit: fields.receiver !== '' && fields.amount > 0, 
     });
 
   const generatePaymentLink = () => {
@@ -131,7 +144,7 @@ function FormPayment() {
     onReceiveOpenChange(); // This will toggle the modal state
   }, [onReceiveOpenChange]);
 
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback((e:any) => {
     // Implement send logic here
     console.log(
       'Sending',
@@ -143,15 +156,13 @@ function FormPayment() {
       'to',
       fields.destinationChain,
     );
-    onSubmitTransaction();
+    onSubmitTransaction(e);
     setIsSendModalOpen(false);
   }, [fields]);
 
   const handleReject = useCallback(() => {
     setIsSendModalOpen(false);
   }, []);
-
-  console.log('fields: ', fields);
 
   if (transactionState !== null) {
     return (
@@ -164,31 +175,17 @@ function FormPayment() {
     );
   }
 
-  const chains = [
-    {
-      key: SupportedChains.arbitrum,
-      shortcut: 'arbitrumSepolia',
-      label: 'Arbitrum Sepolia',
-      ccipChainId: '3478487238524512106',
-      tokenAddress: '',
-      balance: 63,
-    },
-    {
-      key: SupportedChains.base,
-      shortcut: 'baseSepolia',
-      label: 'Base Sepolia',
-      ccipChainId: '10344971235874465080',
-      tokenAddress: '',
-      balance: 45,
-    },
-  ];
-
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-center space-y-6">
       <Select
         className="w-full"
         defaultSelectedKeys={[fields.destinationChain]}
-        onChange={(e) => setField('destinationChain', e.target.value as SupportedChains)}
+        onChange={(e) =>
+          setFields((prevFields) => ({
+            ...prevFields,
+            destinationChain: e.target.value as SupportedChains,
+          }))
+        }
         variant="underlined"
       >
         {chains.map((chain) => (
@@ -242,7 +239,9 @@ function FormPayment() {
                     variant="bordered"
                     type="number"
                     value={fields.amount.toString()}
-                    onChange={(e) => setField('amount', Number(e.target.value))}
+                    onChange={(e) =>
+                      setFields((prevFields) => ({ ...prevFields, amount: Number(e.target.value) }))
+                    }
                     className="bg-gray-800"
                   />
                 </ModalBody>
@@ -307,7 +306,12 @@ function FormPayment() {
               <Select
                 label="Select a Network"
                 selectedKeys={[fields.sourceChain]}
-                onChange={(e) => setField('sourceChain', e.target.value as SupportedChains)}
+                onChange={(e) =>
+                  setFields((prevFields) => ({
+                    ...prevFields,
+                    sourceChain: e.target.value as SupportedChains,
+                  }))
+                }
               >
                 {chains.map((chain) => (
                   <SelectItem key={chain.key} value={chain.key}>
@@ -328,7 +332,7 @@ function FormPayment() {
                 <>
                   <Button
                     color="primary"
-                    onPress={handleSend}
+                    onClick={onSubmitTransaction}
                     className="w-full"
                     isDisabled={disabled}
                   >

@@ -16,17 +16,19 @@ export default function useSmartContractForms({
   name: functionName,
   arguments: args,
   enableSubmit: isValid,
-  reset,
+//  reset,
 }: {
   contract: UseContractReturn<Abi>;
   name: string;
   arguments: (number | string)[];
   enableSubmit: boolean;
-  reset: AsyncFunction<unknown[], unknown>;
+//  reset: AsyncFunction<unknown[], unknown>;
 }) {
   const [transactionState, setTransactionState] = useState<TransactionStates | null>(null);
 
-  const { data: contractRequest } = useSimulateContract({
+  console.log({contract, functionName, args, isValid});
+
+  const { data: contractRequest, error , failureReason} = useSimulateContract({
     address: contract.status === 'ready' ? contract.address : undefined,
     abi: contract.abi,
     functionName: functionName,
@@ -35,6 +37,8 @@ export default function useSmartContractForms({
       enabled: isValid && contract.status === 'ready',
     },
   });
+
+  console.log({contractRequest, error, failureReason});
 
   const {
     writeContract,
@@ -54,12 +58,15 @@ export default function useSmartContractForms({
 
   const onSubmitTransaction = useCallback(
     (event: { preventDefault: () => void }) => {
-      event.preventDefault();
+      //event.preventDefault();
 
       const request = contractRequest?.request;
+      console.log('request', request);
 
       if (request) {
+        console.log(63, "writeContract", contractRequest?.request);
         writeContract(contractRequest?.request);
+        console.log(65, "setTransactionState", TransactionStates.START);
         setTransactionState(TransactionStates.START);
       } else {
         setTransactionState(null);
@@ -91,11 +98,11 @@ export default function useSmartContractForms({
         setTransactionState(TransactionStates.COMPLETE);
       }
 
-      await reset();
+//      await reset();
     }
 
     void onTransactionReceiptStatus();
-  }, [dataHash, reset, setTransactionState, transactionReceiptStatus, writeContractError]);
+  }, [dataHash, /*reset,*/ setTransactionState, transactionReceiptStatus, writeContractError]);
 
   return useMemo(
     () => ({
